@@ -1,4 +1,4 @@
-package com.example.loonberekening;
+package com.example.loef;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

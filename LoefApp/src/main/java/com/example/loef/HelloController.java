@@ -1,4 +1,4 @@
-package com.example.loonberekening;
+package com.example.loef;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

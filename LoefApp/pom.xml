@@ -7,7 +7,7 @@
     <groupId>com.example</groupId>
     <artifactId>loonberekening</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>loonberekening</name>
+    <name>loef</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -63,7 +63,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.example.loonberekening.HelloApplication</mainClass>
+                            <mainClass>com.example.loef.HelloApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
