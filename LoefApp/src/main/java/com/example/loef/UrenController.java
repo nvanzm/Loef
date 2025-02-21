@@ -5,18 +5,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class HelloController {
-    private static final int uurloon = 13;
+public class UrenController {
+    private static final int UURLOON = 13;
     private static final String CONFIG_FILE = "urenLijst.json";
     private static final String DATA_FILE = "dataLijst.json";
 
@@ -31,9 +29,7 @@ public class HelloController {
     public void initialize() {
         dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getData()));
         urenColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getUren())));
-
         dataListTable.setItems(dataObservableList);
-
         toonData();
     }
 
@@ -63,50 +59,29 @@ public class HelloController {
         }
     }
 
-    public static class DataUren {
-        private String data;
-        private double uren;
-
-        public DataUren(String data, double uren) {
-            this.data = data;
-            this.uren = uren;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public double getUren() {
-            return uren;
-        }
-    }
-
     public void telUren() {
-        String eersteUur, tweedeUur, tweedeUurFirstString, eersteUurFirstString, tweedeUurSecondString, eersteUurSecondString;
-        double tweedeUrenFirstDouble, eersteUrenFirstDouble, tweedeUrenSecondDouble, eersteUrenSecondDouble, totalWork;
-
         if (!infoInput.getText().isEmpty()) {
             String infoInputText = infoInput.getText();
             String aangepasteText = infoInputText.substring(11);
 
-            eersteUur = aangepasteText.substring(0, 5);
-            tweedeUur = aangepasteText.substring(8);
+            String eersteUur = aangepasteText.substring(0, 5);
+            String tweedeUur = aangepasteText.substring(8);
 
-            tweedeUurFirstString = tweedeUur.substring(0, 2);
-            tweedeUurSecondString = tweedeUur.substring(3);
+            String tweedeUurFirstString = tweedeUur.substring(0, 2);
+            String tweedeUurSecondString = tweedeUur.substring(3);
 
-            eersteUurFirstString = eersteUur.substring(0, 2);
-            eersteUurSecondString = eersteUur.substring(3);
+            String eersteUurFirstString = eersteUur.substring(0, 2);
+            String eersteUurSecondString = eersteUur.substring(3);
 
-            tweedeUrenFirstDouble = Double.parseDouble(tweedeUurFirstString);
-            eersteUrenFirstDouble = Double.parseDouble(eersteUurFirstString);
-            tweedeUrenSecondDouble = Double.parseDouble(tweedeUurSecondString);
-            eersteUrenSecondDouble = Double.parseDouble(eersteUurSecondString);
+            double tweedeUrenFirstDouble = Double.parseDouble(tweedeUurFirstString);
+            double eersteUrenFirstDouble = Double.parseDouble(eersteUurFirstString);
+            double tweedeUrenSecondDouble = Double.parseDouble(tweedeUurSecondString);
+            double eersteUrenSecondDouble = Double.parseDouble(eersteUurSecondString);
 
             double tweedeUurInDecimalen = tweedeUrenFirstDouble + (tweedeUrenSecondDouble / 60.0);
             double eersteUurInDecimalen = eersteUrenFirstDouble + (eersteUrenSecondDouble / 60.0);
 
-            totalWork = tweedeUurInDecimalen - eersteUurInDecimalen;
+            double totalWork = tweedeUurInDecimalen - eersteUurInDecimalen;
 
             urenOutput.setText("Gewerkte uren: " + totalWork);
             saveUren(totalWork);
@@ -137,7 +112,7 @@ public class HelloController {
             urenOutput.setText("Er zijn nog geen uren opgeslagen.");
         }
 
-        double totaalVerdient = totaalUren * uurloon;
+        double totaalVerdient = totaalUren * UURLOON;
         geldOutput.setText("Totaal verdiend: €" + totaalVerdient);
         urenOutput.setText("Totale uren: " + totaalUren);
     }
@@ -175,6 +150,24 @@ public class HelloController {
             return new JSONObject(inhoud.isEmpty() ? "{}" : inhoud);
         } catch (IOException e) {
             return new JSONObject();
+        }
+    }
+
+    public static class DataUren {
+        private final String data;
+        private final double uren;
+
+        public DataUren(String data, double uren) {
+            this.data = data;
+            this.uren = uren;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public double getUren() {
+            return uren;
         }
     }
 }
