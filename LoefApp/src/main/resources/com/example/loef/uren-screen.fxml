@@ -20,15 +20,15 @@
 
                 <HBox spacing="15.0" alignment="CENTER">
                     <Button text="Voer uren in" onAction="#telUren"
-                            style="-fx-cursor: hand; -fx-background-color: linear-gradient(to right, #0078D7, #00A4E4); -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 2);"/>
+                            style="-fx-cursor: hand; -fx-background-color: linear-gradient(to right, #2c3e50, #34495e); -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 2);"/>
                     <Button text="Bereken loon" onAction="#urenLijst"
-                            style="-fx-cursor: hand; -fx-background-color: linear-gradient(to right, #0078D7, #00A4E4); -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 2);"/>
+                            style="-fx-cursor: hand; -fx-background-color: linear-gradient(to right, #2c3e50, #34495e); -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 2);"/>
                 </HBox>
 
-                <TableView fx:id="dataListTable" prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: #F9F9F9; -fx-border-color: #DDDDDD; -fx-border-radius: 5px; -fx-font-size: 14px; -fx-padding: 10px;">
+                <TableView fx:id="dataListTable" prefHeight="500.0" prefWidth="400.0" style="-fx-background-color: #F9F9F9; -fx-border-color: #DDDDDD; -fx-border-radius: 5px; -fx-font-size: 14px; -fx-padding: 10px;">
                     <columns>
-                        <TableColumn fx:id="dataColumn" text="Opgeslagen Data" prefWidth="300"/>
-                        <TableColumn fx:id="urenColumn" text="Uren" prefWidth="300"/>
+                        <TableColumn fx:id="dataColumn" text="Opgeslagen Data" prefWidth="750"/>
+                        <TableColumn fx:id="urenColumn" text="Uren" prefWidth="750"/>
                     </columns>
                 </TableView>
 
