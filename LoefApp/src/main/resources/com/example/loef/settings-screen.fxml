@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<AnchorPane prefWidth="1920.0" prefHeight="1080.0" xmlns:fx="http://javafx.com/fxml">
+    <HBox prefHeight="1080.0" prefWidth="1920.0">
+        <fx:include source="nav-screen.fxml"/>
+
+        <VBox fx:id="mainContent" style="-fx-padding: 30px;" alignment="CENTER" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+        <AnchorPane prefHeight="60.0" style="-fx-padding: 10px; -fx-background-color: #ecf0f1;">
+            <Label layoutX="20.0" layoutY="15.0"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+                   text="Instellingen"/>
+            </AnchorPane>
+
+            <VBox spacing="20" style="-fx-alignment: CENTER; -fx-padding: 20px;" VBox.vgrow="ALWAYS">
+                <Label text="Theme"/>
+                <ComboBox prefHeight="26.0" prefWidth="200.0" promptText="Default">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Default"/>
+                            <String fx:value="Light"/>
+                            <String fx:value="Dark"/>
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+
+                <Label text="Language"/>
+                <ComboBox prefHeight="26.0" prefWidth="200.0" promptText="English">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="English"/>
+                            <String fx:value="Dutch"/>
+                            <String fx:value="Spanish"/>
+                            <String fx:value="French"/>
+                            <String fx:value="German"/>
+                            <String fx:value="Italian"/>
+                            <String fx:value="Portuguese"/>
+                            <String fx:value="Chinese"/>
+                            <String fx:value="Japanese"/>
+                            <String fx:value="Russian"/>
+                            <String fx:value="Arabic"/>
+                            <String fx:value="Hindi"/>
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+
+                <Label style="-fx-cursor: hand;" text="Notifications"/>
+
+                <CheckBox style="-fx-cursor: hand;" text="Enable notifications"/>
+
+                <Label style="-fx-cursor: hand;" text="Report a problem"/>
+
+                <Label style="-fx-cursor: hand;" text="Support"/>
+
+                <Label style="-fx-cursor: hand;" text="Terms and Policies"/>
+            </VBox>
+        </VBox>
+    </HBox>
+</AnchorPane>

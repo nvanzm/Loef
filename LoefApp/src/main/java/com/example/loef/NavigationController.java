@@ -35,6 +35,10 @@ public class NavigationController {
         switchScene(event, "uren-screen.fxml");
     }
 
+    public void settings(ActionEvent event) throws IOException {
+        switchScene(event, "settings-screen.fxml");
+    }
+
     public void logout(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Logout");
