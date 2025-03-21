@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import org.apache.poi.ss.usermodel.*;
@@ -47,7 +48,36 @@ public class UrenController {
         configureMaandSelectieListener();
         toonData();
         updateUrenEnLoon();
+
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem deleteItem = new MenuItem("Delete");
+
+        deleteItem.setStyle(
+                "-fx-background-color: #e74c3c; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 10px 15px; " +
+                        "-fx-border-radius: 3px; "
+        );
+        deleteItem.setOnAction(event -> deleteSelectedItem());
+        contextMenu.getItems().add(deleteItem);
+
+        dataListTable.setRowFactory(tableView -> {
+            TableRow<DataUren> row = new TableRow<>();
+
+            row.setContextMenu(contextMenu);
+
+            row.setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.PRIMARY && !row.isEmpty()) {
+                    DataUren selectedItem = row.getItem();
+                }
+            });
+
+            return row;
+        });
     }
+
 
     private void configureTableColumns() {
         dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getData()));
@@ -186,6 +216,41 @@ public class UrenController {
         toonData();
     }
 
+    private void deleteSelectedItem() {
+        DataUren selectedItem = dataListTable.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            dataObservableList.remove(selectedItem);
+            removeDataFromJson(selectedItem);
+            updateUrenEnLoon();
+        }
+    }
+
+    private void removeDataFromJson(DataUren selectedItem) {
+        String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
+        JSONObject jsonObject = jsonService.leesJsonBestand(bestandsPad);
+
+        // Verwijder data
+        JSONArray dataArray = jsonObject.optJSONArray("data");
+        JSONArray urenArray = jsonObject.optJSONArray("uren");
+
+        if (dataArray != null && urenArray != null) {
+            int index = dataArray.toList().indexOf(selectedItem.getData());
+            if (index != -1) {
+                dataArray.remove(index);
+                urenArray.remove(index);
+
+                jsonObject.put("data", dataArray);
+                jsonObject.put("uren", urenArray);
+            }
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(bestandsPad))) {
+            writer.write(jsonObject.toString(4));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static class DataUren {
         private final String data;
         private final double uren;
@@ -203,65 +268,65 @@ public class UrenController {
             return uren;
         }
     }
-}
 
-class ExcelExporter {
+    class ExcelExporter {
 
-    public void exportToExcel(String maand, JSONArray dataArray, JSONArray urenArray) throws IOException {
-        Workbook werkboek = new XSSFWorkbook();
-        Sheet sheet = werkboek.createSheet(maand);
+        public void exportToExcel(String maand, JSONArray dataArray, JSONArray urenArray) throws IOException {
+            Workbook werkboek = new XSSFWorkbook();
+            Sheet sheet = werkboek.createSheet(maand);
 
-        Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("Datum");
-        headerRow.createCell(1).setCellValue("Uren");
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Datum");
+            headerRow.createCell(1).setCellValue("Uren");
 
-        for (int i = 0; i < dataArray.length(); i++) {
-            Row row = sheet.createRow(i + 1);
-            row.createCell(0).setCellValue(dataArray.getString(i));
-            row.createCell(1).setCellValue(urenArray.getDouble(i));
-        }
+            for (int i = 0; i < dataArray.length(); i++) {
+                Row row = sheet.createRow(i + 1);
+                row.createCell(0).setCellValue(dataArray.getString(i));
+                row.createCell(1).setCellValue(urenArray.getDouble(i));
+            }
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel bestand", "*.xlsx"));
-        fileChooser.setInitialFileName(maand + ".xlsx");
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel bestand", "*.xlsx"));
+            fileChooser.setInitialFileName(maand + ".xlsx");
 
-        File gekozenBestand = fileChooser.showSaveDialog(null);
-        if (gekozenBestand != null) {
-            try (FileOutputStream fileOut = new FileOutputStream(gekozenBestand)) {
-                werkboek.write(fileOut);
-                werkboek.close();
+            File gekozenBestand = fileChooser.showSaveDialog(null);
+            if (gekozenBestand != null) {
+                try (FileOutputStream fileOut = new FileOutputStream(gekozenBestand)) {
+                    werkboek.write(fileOut);
+                    werkboek.close();
 
-                new Alert(Alert.AlertType.INFORMATION, "Bestand succesvol opgeslagen als Excel!", ButtonType.OK).showAndWait();
+                    new Alert(Alert.AlertType.INFORMATION, "Bestand succesvol opgeslagen als Excel!", ButtonType.OK).showAndWait();
+                }
             }
         }
     }
-}
 
-class JsonService {
+    class JsonService {
 
-    public void saveJsonData(String sleutel, Object waarde, String maand) {
-        String bestandsPad = Paths.get(UrenController.MAP_NAAM, maand + ".json").toString();
-        JSONObject jsonObject = leesJsonBestand(bestandsPad);
-        JSONArray jsonArray = jsonObject.optJSONArray(sleutel);
-        if (jsonArray == null) jsonArray = new JSONArray();
+        public void saveJsonData(String sleutel, Object waarde, String maand) {
+            String bestandsPad = Paths.get(UrenController.MAP_NAAM, maand + ".json").toString();
+            JSONObject jsonObject = leesJsonBestand(bestandsPad);
+            JSONArray jsonArray = jsonObject.optJSONArray(sleutel);
+            if (jsonArray == null) jsonArray = new JSONArray();
 
-        jsonArray.put(waarde);
-        jsonObject.put(sleutel, jsonArray);
+            jsonArray.put(waarde);
+            jsonObject.put(sleutel, jsonArray);
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(bestandsPad))) {
-            writer.write(jsonObject.toString(4));
-        } catch (IOException e) {
-            System.err.println("Fout bij opslaan: " + e.getMessage());
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(bestandsPad))) {
+                writer.write(jsonObject.toString(4));
+            } catch (IOException e) {
+                System.err.println("Fout bij opslaan: " + e.getMessage());
+            }
         }
-    }
 
-    private JSONObject leesJsonBestand(String bestandspad) {
-        try {
-            String inhoud = new String(Files.readAllBytes(Paths.get(bestandspad)));
-            return new JSONObject(inhoud.isEmpty() ? "{}" : inhoud);
-        } catch (IOException e) {
-            System.err.println("Fout bij laden van JSON-bestand: " + e.getMessage());
-            return new JSONObject();
+        private JSONObject leesJsonBestand(String bestandspad) {
+            try {
+                String inhoud = new String(Files.readAllBytes(Paths.get(bestandspad)));
+                return new JSONObject(inhoud.isEmpty() ? "{}" : inhoud);
+            } catch (IOException e) {
+                System.err.println("Fout bij laden van JSON-bestand: " + e.getMessage());
+                return new JSONObject();
+            }
         }
     }
 }
