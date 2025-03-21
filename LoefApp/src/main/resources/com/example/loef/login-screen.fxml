@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.loef.LoginController"
+      spacing="20" alignment="CENTER" style="-fx-padding: 50; -fx-background-color: linear-gradient(to bottom, #1a1a2e, #16213e);">
+
+    <!-- Login container -->
+    <VBox fx:id="loginContainer" spacing="20" alignment="CENTER" style="-fx-background-color: rgba(255, 255, 255, 0.15);
+            -fx-background-radius: 15; -fx-padding: 30; -fx-pref-width: 450;">
+
+        <!-- Titel -->
+        <Label text="✨ Loef ✨" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #00d4ff;
+                -fx-font-family: 'Arial Rounded MT Bold';"/>
+
+        <!-- Gebruikersnaam veld -->
+        <VBox spacing="10" alignment="CENTER_LEFT" style="-fx-pref-width: 100%;">
+            <Label text="Gebruikersnaam:" style="-fx-font-size: 16; -fx-text-fill: white;"/>
+            <TextField fx:id="gebruikersnaamField" style="-fx-background-color: rgba(255, 255, 255, 0.2);
+                    -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: #00d4ff;
+                    -fx-border-radius: 10; -fx-border-width: 2;"/>
+        </VBox>
+
+        <!-- Wachtwoord veld -->
+        <VBox spacing="10" alignment="CENTER_LEFT" style="-fx-pref-width: 100%;">
+            <Label text="Wachtwoord:" style="-fx-font-size: 16; -fx-text-fill: white;"/>
+            <PasswordField fx:id="passwordField" style="-fx-background-color: rgba(255, 255, 255, 0.2);
+                    -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: #00d4ff;
+                    -fx-border-radius: 10; -fx-border-width: 2;"/>
+        </VBox>
+
+        <!-- Feedback label -->
+        <Label fx:id="feedbackLabel" style="-fx-text-fill: red; -fx-font-size: 14;" wrapText="true"/>
+
+        <!-- Knoppen -->
+        <HBox spacing="20" alignment="CENTER">
+            <Button text="🔐 Inloggen" fx:id="loginButton" style="-fx-background-color: #00d4ff;
+                    -fx-text-fill: #16213e; -fx-font-size: 16; -fx-background-radius: 10; -fx-padding: 12 25;
+                    -fx-font-weight: bold; -fx-cursor: hand;"/>
+            <Button text="❌ Sluiten" fx:id="closeButton" style="-fx-background-color: #ff4b5c;
+                    -fx-text-fill: white; -fx-font-size: 16; -fx-background-radius: 10; -fx-padding: 12 25;
+                    -fx-font-weight: bold; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+</VBox>

@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefWidth="1920.0" prefHeight="1080.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.loef.RoosterController">
-    <HBox prefHeight="1080.0" prefWidth="1920.0" spacing="0.0">
+    <HBox fx:id="mainHBox" prefHeight="1080.0" prefWidth="1920.0">
         <fx:include source="nav-screen.fxml"/>
 
         <VBox fx:id="mainContent" style="-fx-padding: 30px;" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="20.0">

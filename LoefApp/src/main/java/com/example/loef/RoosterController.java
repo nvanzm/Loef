@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -27,8 +28,14 @@ public class RoosterController implements Initializable {
     @FXML
     private FlowPane calendar;
 
+    @FXML
+    private HBox mainHBox;
+
+    private final ResolutionController resolutionManager = ResolutionController.getInstance();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        applyResolution(resolutionManager.getCurrentResolution());
         dateFocus = ZonedDateTime.now();
         today = ZonedDateTime.now();
         drawCalendar();
@@ -46,6 +53,20 @@ public class RoosterController implements Initializable {
         dateFocus = dateFocus.plusMonths(1);
         calendar.getChildren().clear();
         drawCalendar();
+    }
+
+    private void applyResolution(String resolution) {
+        String[] dimensions = resolution.split("x");
+        if (dimensions.length == 2) {
+            try {
+                double width = Double.parseDouble(dimensions[0]);
+                double height = Double.parseDouble(dimensions[1]);
+                mainHBox.setPrefWidth(width);
+                mainHBox.setPrefHeight(height);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void drawCalendar(){

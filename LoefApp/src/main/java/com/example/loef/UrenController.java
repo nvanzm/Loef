@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,7 +15,7 @@ import java.nio.file.Paths;
 public class UrenController {
     private static final int UURLOON = 13;
     private static final String MAP_NAAM = "maandenData/";
-    private String geselecteerdeMaand = "Februari";
+    private String geselecteerdeMaand = "Maart";
 
     @FXML
     private TextField infoInput;
@@ -26,11 +27,17 @@ public class UrenController {
     private TableColumn<DataUren, String> dataColumn, urenColumn;
     @FXML
     private ComboBox<String> maandSelectie;
+    @FXML
+    private HBox mainHBox;
+
+    private final ResolutionController resolutionManager = ResolutionController.getInstance();
 
     private final ObservableList<DataUren> dataObservableList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
+        applyResolution(resolutionManager.getCurrentResolution());
+
         dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getData()));
         urenColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getUren())));
         dataListTable.setItems(dataObservableList);
@@ -44,6 +51,20 @@ public class UrenController {
 
         updateUrenEnLoon();
         toonData();
+    }
+
+    private void applyResolution(String resolution) {
+        String[] dimensions = resolution.split("x");
+        if (dimensions.length == 2) {
+            try {
+                double width = Double.parseDouble(dimensions[0]);
+                double height = Double.parseDouble(dimensions[1]);
+                mainHBox.setPrefWidth(width);
+                mainHBox.setPrefHeight(height);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void toonData() {

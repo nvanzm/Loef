@@ -5,7 +5,7 @@
 <?import java.lang.String?>
 
 <AnchorPane prefWidth="1920.0" prefHeight="1080.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.loef.UrenController">
-    <HBox prefHeight="1080.0" prefWidth="1920.0">
+    <HBox fx:id="mainHBox" prefHeight="1080.0" prefWidth="1920.0">
         <fx:include source="nav-screen.fxml"/>
 
         <VBox fx:id="mainContent" style="-fx-padding: 30px;" alignment="CENTER" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
@@ -18,7 +18,7 @@
                           style="-fx-pref-width: 200px; -fx-background-color: white;
                                  -fx-border-color: #2c3e50; -fx-border-radius: 5px;
                                  -fx-padding: 5px; -fx-font-size: 14px;
-                                 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);" promptText="Februari">
+                                 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);" promptText="Maart">
                     <AnchorPane.rightAnchor>20.0</AnchorPane.rightAnchor>
                     <items>
                         <FXCollections fx:factory="observableArrayList">
