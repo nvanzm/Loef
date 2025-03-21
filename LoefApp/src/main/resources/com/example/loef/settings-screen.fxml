@@ -60,7 +60,7 @@
                         </FXCollections>
                     </items>
                 </ComboBox>
-                
+
                 <CheckBox style="-fx-cursor: hand;" text="Enable notifications"/>
 
                 <Label style="-fx-cursor: hand;" text="Report a problem"/>

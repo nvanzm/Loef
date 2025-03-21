@@ -4,6 +4,7 @@ module com.example.loef {
     requires java.compiler;
     requires org.json;
     requires java.prefs;
+    requires org.apache.poi.ooxml;
 
 
     opens com.example.loef to javafx.fxml;

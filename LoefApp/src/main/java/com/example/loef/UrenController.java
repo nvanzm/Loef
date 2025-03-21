@@ -1,10 +1,14 @@
 package com.example.loef;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,9 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class UrenController {
+
     private static final int UURLOON = 13;
-    private static final String MAP_NAAM = "maandenData/";
-    private String geselecteerdeMaand = "Maart";
+    public static final String MAP_NAAM = "maandenData/";
+    public String geselecteerdeMaand = "Maart";
 
     @FXML
     private TextField infoInput;
@@ -30,27 +35,64 @@ public class UrenController {
     @FXML
     private HBox mainHBox;
 
-    private final ResolutionController resolutionManager = ResolutionController.getInstance();
-
     private final ObservableList<DataUren> dataObservableList = FXCollections.observableArrayList();
+    private final ResolutionController resolutionManager = ResolutionController.getInstance();
+    private final JsonService jsonService = new JsonService();
+    private final ExcelExporter excelExporter = new ExcelExporter();
 
     @FXML
     public void initialize() {
+        configureTableColumns();
         applyResolution(resolutionManager.getCurrentResolution());
+        configureMaandSelectieListener();
+        toonData();
+        updateUrenEnLoon();
+    }
 
+    private void configureTableColumns() {
         dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getData()));
         urenColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getUren())));
         dataListTable.setItems(dataObservableList);
+    }
 
+    private void configureMaandSelectieListener() {
         maandSelectie.getSelectionModel().selectedItemProperty().addListener((observable, oudeWaarde, nieuweWaarde) -> {
             if (nieuweWaarde != null) {
                 geselecteerdeMaand = nieuweWaarde;
                 toonData();
             }
         });
+    }
 
-        updateUrenEnLoon();
-        toonData();
+    @FXML
+    public void exportExcel() {
+        String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
+        File bestand = new File(bestandsPad);
+
+        if (!bestand.exists()) {
+            showAlert(Alert.AlertType.ERROR, "Geen gegevens beschikbaar voor " + geselecteerdeMaand);
+            return;
+        }
+
+        try {
+            String inhoud = new String(Files.readAllBytes(Paths.get(bestandsPad)));
+            JSONObject json = new JSONObject(inhoud);
+
+            JSONArray dataArray = json.optJSONArray("data");
+            JSONArray urenArray = json.optJSONArray("uren");
+
+            if (dataArray != null && urenArray != null) {
+                excelExporter.exportToExcel(geselecteerdeMaand, dataArray, urenArray);
+            }
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Fout bij het lezen van het JSON-bestand.");
+            e.printStackTrace();
+        }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String message) {
+        Alert alert = new Alert(alertType, message, ButtonType.OK);
+        alert.showAndWait();
     }
 
     private void applyResolution(String resolution) {
@@ -135,17 +177,70 @@ public class UrenController {
     }
 
     private void saveUren(double totaleUren) {
-        saveJsonData("uren", totaleUren);
+        jsonService.saveJsonData("uren", totaleUren, geselecteerdeMaand);
         toonData();
     }
 
     private void saveData(String data) {
-        saveJsonData("data", data);
+        jsonService.saveJsonData("data", data, geselecteerdeMaand);
         toonData();
     }
 
-    private void saveJsonData(String sleutel, Object waarde) {
-        String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
+    public static class DataUren {
+        private final String data;
+        private final double uren;
+
+        public DataUren(String data, double uren) {
+            this.data = data;
+            this.uren = uren;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public double getUren() {
+            return uren;
+        }
+    }
+}
+
+class ExcelExporter {
+
+    public void exportToExcel(String maand, JSONArray dataArray, JSONArray urenArray) throws IOException {
+        Workbook werkboek = new XSSFWorkbook();
+        Sheet sheet = werkboek.createSheet(maand);
+
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("Datum");
+        headerRow.createCell(1).setCellValue("Uren");
+
+        for (int i = 0; i < dataArray.length(); i++) {
+            Row row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(dataArray.getString(i));
+            row.createCell(1).setCellValue(urenArray.getDouble(i));
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel bestand", "*.xlsx"));
+        fileChooser.setInitialFileName(maand + ".xlsx");
+
+        File gekozenBestand = fileChooser.showSaveDialog(null);
+        if (gekozenBestand != null) {
+            try (FileOutputStream fileOut = new FileOutputStream(gekozenBestand)) {
+                werkboek.write(fileOut);
+                werkboek.close();
+
+                new Alert(Alert.AlertType.INFORMATION, "Bestand succesvol opgeslagen als Excel!", ButtonType.OK).showAndWait();
+            }
+        }
+    }
+}
+
+class JsonService {
+
+    public void saveJsonData(String sleutel, Object waarde, String maand) {
+        String bestandsPad = Paths.get(UrenController.MAP_NAAM, maand + ".json").toString();
         JSONObject jsonObject = leesJsonBestand(bestandsPad);
         JSONArray jsonArray = jsonObject.optJSONArray(sleutel);
         if (jsonArray == null) jsonArray = new JSONArray();
@@ -167,24 +262,6 @@ public class UrenController {
         } catch (IOException e) {
             System.err.println("Fout bij laden van JSON-bestand: " + e.getMessage());
             return new JSONObject();
-        }
-    }
-
-    public static class DataUren {
-        private final String data;
-        private final double uren;
-
-        public DataUren(String data, double uren) {
-            this.data = data;
-            this.uren = uren;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public double getUren() {
-            return uren;
         }
     }
 }

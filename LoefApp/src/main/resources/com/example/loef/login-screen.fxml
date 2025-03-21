@@ -34,10 +34,10 @@
 
         <!-- Knoppen -->
         <HBox spacing="20" alignment="CENTER">
-            <Button text="🔐 Inloggen" fx:id="loginButton" style="-fx-background-color: #00d4ff;
+            <Button text="🔐 Inloggen" fx:id="loginButton" onAction="#handleLoginAction" style="-fx-background-color: #00d4ff;
                     -fx-text-fill: #16213e; -fx-font-size: 16; -fx-background-radius: 10; -fx-padding: 12 25;
                     -fx-font-weight: bold; -fx-cursor: hand;"/>
-            <Button text="❌ Sluiten" fx:id="closeButton" style="-fx-background-color: #ff4b5c;
+            <Button text="❌ Sluiten" fx:id="closeButton" onAction="#handleCloseAction" style="-fx-background-color: #ff4b5c;
                     -fx-text-fill: white; -fx-font-size: 16; -fx-background-radius: 10; -fx-padding: 12 25;
                     -fx-font-weight: bold; -fx-cursor: hand;"/>
         </HBox>
