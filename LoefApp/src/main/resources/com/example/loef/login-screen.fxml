@@ -2,7 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.loef.LoginController"
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.loef.controllers.LoginController"
       spacing="20" alignment="CENTER" style="-fx-padding: 50; -fx-background-color: linear-gradient(to bottom, #1a1a2e, #16213e);">
 
     <!-- Login container -->

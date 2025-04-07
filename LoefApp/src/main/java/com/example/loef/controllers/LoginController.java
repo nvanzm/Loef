@@ -1,5 +1,6 @@
-package com.example.loef;
+package com.example.loef.controllers;
 
+import com.example.loef.Startup;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,7 +32,7 @@ public class LoginController {
 
     private static void switchToView(ActionEvent event, String fxmlFileName) {
         try {
-            FXMLLoader loader = new FXMLLoader(UrenApplication.class.getResource(fxmlFileName));
+            FXMLLoader loader = new FXMLLoader(Startup.class.getResource(fxmlFileName));
             Parent root = loader.load();
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -67,15 +68,12 @@ public class LoginController {
             // Werknemer
             feedbackLabel.setStyle("-fx-text-fill: green;");
             feedbackLabel.setText("Logging in...");
-            switchToView(event, "/com/example/loef/uren-screen.fxml");
-
-//            splashscreen??
-//            SplashScreen.main(null);
+            switchToView(event, "/com/example/loef/werknemer/werknemer-uren-screen.fxml");
         } else if (gebruikersnaamField.getText().equals("admin") && passwordField.getText().equals("admin")) {
             // Werkgever
             feedbackLabel.setStyle("-fx-text-fill: green;");
             feedbackLabel.setText("Welkom, Admin!");
-//            switchToView(event, "/com/example/loef/admin-dashboard.fxml");
+            switchToView(event, "/com/example/loef/werkgever/werkgever-uren-screen.fxml");
         } else {
             feedbackLabel.setStyle("-fx-text-fill: red;");
             feedbackLabel.setText("Ongeldige gebruikersnaam of wachtwoord.");

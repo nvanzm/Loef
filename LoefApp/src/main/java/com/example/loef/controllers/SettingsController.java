@@ -1,4 +1,4 @@
-package com.example.loef;
+package com.example.loef.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;

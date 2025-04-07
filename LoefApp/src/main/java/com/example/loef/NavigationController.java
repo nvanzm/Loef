@@ -27,12 +27,20 @@ public class NavigationController {
         stage.show();
     }
 
-    public void rooster(ActionEvent event) throws IOException {
-        switchScene(event, "rooster-screen.fxml");
+    public void werknemerRooster(ActionEvent event) throws IOException {
+        switchScene(event, "werknemer/werknemer-rooster-screen.fxml");
     }
 
-    public void uren(ActionEvent event) throws IOException {
-        switchScene(event, "uren-screen.fxml");
+    public void werknemerUren(ActionEvent event) throws IOException {
+        switchScene(event, "werknemer/werknemer-uren-screen.fxml");
+    }
+
+    public void werkgeverRooster(ActionEvent event) throws IOException {
+        switchScene(event, "werkgever/werkgever-rooster-screen.fxml");
+    }
+
+    public void werkgeverUren(ActionEvent event) throws IOException {
+        switchScene(event, "werkgever/werkgever-uren-screen.fxml");
     }
 
     public void settings(ActionEvent event) throws IOException {

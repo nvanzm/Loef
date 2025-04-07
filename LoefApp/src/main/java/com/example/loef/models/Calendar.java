@@ -1,13 +1,13 @@
-package com.example.loef;
+package com.example.loef.models;
 
 import java.time.ZonedDateTime;
 
-public class CalendarActivity {
+public class Calendar {
     private ZonedDateTime date;
     private String clientName;
     private Integer serviceNo;
 
-    public CalendarActivity(ZonedDateTime date, String clientName, Integer serviceNo) {
+    public Calendar(ZonedDateTime date, String clientName, Integer serviceNo) {
         this.date = date;
         this.clientName = clientName;
         this.serviceNo = serviceNo;

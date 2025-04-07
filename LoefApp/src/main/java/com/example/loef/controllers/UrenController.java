@@ -1,5 +1,8 @@
-package com.example.loef;
+package com.example.loef.controllers;
 
+import com.example.loef.models.DataUren;
+import com.example.loef.models.WerknemerData;
+import com.example.loef.util.JsonService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,7 +24,7 @@ public class UrenController {
 
     private static final int UURLOON = 13;
     public static final String MAP_NAAM = "maandenData/";
-    public String geselecteerdeMaand = "Maart";
+    public String geselecteerdeMaand = "April";
 
     @FXML
     private TextField infoInput;
@@ -38,8 +41,9 @@ public class UrenController {
 
     private final ObservableList<DataUren> dataObservableList = FXCollections.observableArrayList();
     private final ResolutionController resolutionManager = ResolutionController.getInstance();
-    private final JsonService jsonService = new JsonService();
     private final ExcelExporter excelExporter = new ExcelExporter();
+
+    private final JsonService jsonService = new JsonService();
 
     @FXML
     public void initialize() {
@@ -77,7 +81,6 @@ public class UrenController {
             return row;
         });
     }
-
 
     private void configureTableColumns() {
         dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getData()));
@@ -198,7 +201,7 @@ public class UrenController {
         }
     }
 
-    private void updateUrenEnLoon() {
+    public void updateUrenEnLoon() {
         double totaalUren = dataObservableList.stream().mapToDouble(DataUren::getUren).sum();
         double totaalVerdient = totaalUren * UURLOON;
 
@@ -207,12 +210,12 @@ public class UrenController {
     }
 
     private void saveUren(double totaleUren) {
-        jsonService.saveJsonData("uren", totaleUren, geselecteerdeMaand);
+        JsonService.saveJsonData("uren", totaleUren, geselecteerdeMaand);
         toonData();
     }
 
     private void saveData(String data) {
-        jsonService.saveJsonData("data", data, geselecteerdeMaand);
+        JsonService.saveJsonData("data", data, geselecteerdeMaand);
         toonData();
     }
 
@@ -227,9 +230,8 @@ public class UrenController {
 
     private void removeDataFromJson(DataUren selectedItem) {
         String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
-        JSONObject jsonObject = jsonService.leesJsonBestand(bestandsPad);
+        JSONObject jsonObject = JsonService.leesJsonBestand(bestandsPad);
 
-        // Verwijder data
         JSONArray dataArray = jsonObject.optJSONArray("data");
         JSONArray urenArray = jsonObject.optJSONArray("uren");
 
@@ -248,24 +250,6 @@ public class UrenController {
             writer.write(jsonObject.toString(4));
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static class DataUren {
-        private final String data;
-        private final double uren;
-
-        public DataUren(String data, double uren) {
-            this.data = data;
-            this.uren = uren;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public double getUren() {
-            return uren;
         }
     }
 
@@ -297,35 +281,6 @@ public class UrenController {
 
                     new Alert(Alert.AlertType.INFORMATION, "Bestand succesvol opgeslagen als Excel!", ButtonType.OK).showAndWait();
                 }
-            }
-        }
-    }
-
-    class JsonService {
-
-        public void saveJsonData(String sleutel, Object waarde, String maand) {
-            String bestandsPad = Paths.get(UrenController.MAP_NAAM, maand + ".json").toString();
-            JSONObject jsonObject = leesJsonBestand(bestandsPad);
-            JSONArray jsonArray = jsonObject.optJSONArray(sleutel);
-            if (jsonArray == null) jsonArray = new JSONArray();
-
-            jsonArray.put(waarde);
-            jsonObject.put(sleutel, jsonArray);
-
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(bestandsPad))) {
-                writer.write(jsonObject.toString(4));
-            } catch (IOException e) {
-                System.err.println("Fout bij opslaan: " + e.getMessage());
-            }
-        }
-
-        private JSONObject leesJsonBestand(String bestandspad) {
-            try {
-                String inhoud = new String(Files.readAllBytes(Paths.get(bestandspad)));
-                return new JSONObject(inhoud.isEmpty() ? "{}" : inhoud);
-            } catch (IOException e) {
-                System.err.println("Fout bij laden van JSON-bestand: " + e.getMessage());
-                return new JSONObject();
             }
         }
     }

@@ -1,5 +1,6 @@
-package com.example.loef;
+package com.example.loef.controllers;
 
+import com.example.loef.models.Calendar;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -79,7 +80,7 @@ public class RoosterController implements Initializable {
         double spacingH = calendar.getHgap();
         double spacingV = calendar.getVgap();
 
-        Map<Integer, List<CalendarActivity>> calendarActivityMap = getCalendarActivitiesMonth(dateFocus);
+        Map<Integer, List<Calendar>> calendarActivityMap = getCalendarActivitiesMonth(dateFocus);
 
         int monthMaxDate = dateFocus.getMonth().maxLength();
         if(dateFocus.getYear() % 4 != 0 && monthMaxDate == 29){
@@ -110,7 +111,7 @@ public class RoosterController implements Initializable {
                         date.setTranslateY(textTranslationY);
                         stackPane.getChildren().add(date);
 
-                        List<CalendarActivity> calendarActivities = calendarActivityMap.get(currentDate);
+                        List<Calendar> calendarActivities = calendarActivityMap.get(currentDate);
                         if(calendarActivities != null){
                             createCalendarActivity(calendarActivities, rectangleHeight, rectangleWidth, stackPane);
                         }
@@ -124,7 +125,7 @@ public class RoosterController implements Initializable {
         }
     }
 
-    private void createCalendarActivity(List<CalendarActivity> calendarActivities, double rectangleHeight, double rectangleWidth, StackPane stackPane) {
+    private void createCalendarActivity(List<Calendar> calendarActivities, double rectangleHeight, double rectangleWidth, StackPane stackPane) {
         VBox calendarActivityBox = new VBox();
         for (int k = 0; k < calendarActivities.size(); k++) {
             if(k >= 2) {
@@ -148,17 +149,17 @@ public class RoosterController implements Initializable {
         stackPane.getChildren().add(calendarActivityBox);
     }
 
-    private Map<Integer, List<CalendarActivity>> createCalendarMap(List<CalendarActivity> calendarActivities) {
-        Map<Integer, List<CalendarActivity>> calendarActivityMap = new HashMap<>();
+    private Map<Integer, List<Calendar>> createCalendarMap(List<Calendar> calendarActivities) {
+        Map<Integer, List<Calendar>> calendarActivityMap = new HashMap<>();
 
-        for (CalendarActivity activity: calendarActivities) {
+        for (Calendar activity: calendarActivities) {
             int activityDate = activity.getDate().getDayOfMonth();
             if(!calendarActivityMap.containsKey(activityDate)){
                 calendarActivityMap.put(activityDate, List.of(activity));
             } else {
-                List<CalendarActivity> OldListByDate = calendarActivityMap.get(activityDate);
+                List<Calendar> OldListByDate = calendarActivityMap.get(activityDate);
 
-                List<CalendarActivity> newList = new ArrayList<>(OldListByDate);
+                List<Calendar> newList = new ArrayList<>(OldListByDate);
                 newList.add(activity);
                 calendarActivityMap.put(activityDate, newList);
             }
@@ -166,15 +167,15 @@ public class RoosterController implements Initializable {
         return  calendarActivityMap;
     }
 
-    private Map<Integer, List<CalendarActivity>> getCalendarActivitiesMonth(ZonedDateTime dateFocus) {
-        List<CalendarActivity> calendarActivities = new ArrayList<>();
+    private Map<Integer, List<Calendar>> getCalendarActivitiesMonth(ZonedDateTime dateFocus) {
+        List<Calendar> calendarActivities = new ArrayList<>();
         int year = dateFocus.getYear();
         int month = dateFocus.getMonth().getValue();
 
         Random random = new Random();
         for (int i = 0; i < 50; i++) {
             ZonedDateTime time = ZonedDateTime.of(year, month, random.nextInt(27)+1, 16,0,0,0,dateFocus.getZone());
-            calendarActivities.add(new CalendarActivity(time, "Noach", 111111));
+            calendarActivities.add(new Calendar(time, "Noach", 111111));
         }
 
         return createCalendarMap(calendarActivities);
