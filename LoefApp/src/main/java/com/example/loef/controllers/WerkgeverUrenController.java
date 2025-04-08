@@ -54,7 +54,7 @@ public class WerkgeverUrenController {
     }
 
     @FXML
-    private void selecteerWerknemer() {
+    public void selecteerWerknemer() {
         String geselecteerdeNaam = werknemersLijst.getSelectionModel().getSelectedItem();
         werknemer = dataService.getWerknemerByNaam(geselecteerdeNaam);
 

@@ -1,5 +1,6 @@
 package com.example.loef.controllers;
 
+import com.example.loef.models.Login;
 import com.example.loef.Startup;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,6 +19,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class LoginController {
+
     @FXML
     private TextField gebruikersnaamField;
 
@@ -57,26 +59,25 @@ public class LoginController {
     }
 
     public void handleCloseAction() {
+        System.out.println("Succesvol afgesloten.");
         System.exit(0);
     }
 
     public void handleLoginAction(ActionEvent event) {
-        if (gebruikersnaamField.getText().isEmpty() || passwordField.getText().isEmpty()) {
-            feedbackLabel.setText("Vul alle velden in.");
-            feedbackLabel.setStyle("-fx-text-fill: red;");
-        } else if (gebruikersnaamField.getText().equals("noach") && passwordField.getText().equals("123")) {
-            // Werknemer
+        Login login = new Login(gebruikersnaamField.getText(), passwordField.getText());
+
+        String feedback = login.validate();
+
+        if (feedback.equals("Logging in...")) {
             feedbackLabel.setStyle("-fx-text-fill: green;");
-            feedbackLabel.setText("Logging in...");
             switchToView(event, "/com/example/loef/werknemer/werknemer-uren-screen.fxml");
-        } else if (gebruikersnaamField.getText().equals("admin") && passwordField.getText().equals("admin")) {
-            // Werkgever
+        } else if (feedback.equals("Welkom, Admin!")) {
             feedbackLabel.setStyle("-fx-text-fill: green;");
-            feedbackLabel.setText("Welkom, Admin!");
             switchToView(event, "/com/example/loef/werkgever/werkgever-uren-screen.fxml");
         } else {
             feedbackLabel.setStyle("-fx-text-fill: red;");
-            feedbackLabel.setText("Ongeldige gebruikersnaam of wachtwoord.");
         }
+        System.out.println(feedback);
     }
+
 }

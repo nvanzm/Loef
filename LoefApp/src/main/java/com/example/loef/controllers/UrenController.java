@@ -1,7 +1,6 @@
 package com.example.loef.controllers;
 
 import com.example.loef.models.DataUren;
-import com.example.loef.models.WerknemerData;
 import com.example.loef.util.JsonService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -196,17 +195,28 @@ public class UrenController {
             saveUren(totalWork);
             saveData(infoInput.getText());
             updateUrenEnLoon();
+
+            infoInput.clear();
+            substringOutput.setText("");
+            System.out.println("Succesvol ingevuld!");
         } else {
             substringOutput.setText("Voer een reeks in!");
         }
     }
 
-    public void updateUrenEnLoon() {
-        double totaalUren = dataObservableList.stream().mapToDouble(DataUren::getUren).sum();
-        double totaalVerdient = totaalUren * UURLOON;
+    public boolean updateUrenEnLoon() {
+        try {
+            double totaalUren = dataObservableList.stream().mapToDouble(DataUren::getUren).sum();
+            double totaalVerdient = totaalUren * UURLOON;
 
-        urenOutput.setText("Gewerkte uren: " + totaalUren);
-        geldOutput.setText("Totaal verdiend: €" + String.format("%.2f", totaalVerdient));
+            urenOutput.setText("Gewerkte uren: " + totaalUren);
+            geldOutput.setText("Totaal verdiend: €" + String.format("%.2f", totaalVerdient));
+
+            return true;
+        } catch (Exception e) {
+            System.out.println("Opslaan is mislukt.");
+            return false;
+        }
     }
 
     private void saveUren(double totaleUren) {
