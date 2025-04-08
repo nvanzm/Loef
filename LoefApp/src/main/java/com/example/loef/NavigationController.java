@@ -43,8 +43,12 @@ public class NavigationController {
         switchScene(event, "werkgever/werkgever-uren-screen.fxml");
     }
 
-    public void settings(ActionEvent event) throws IOException {
-        switchScene(event, "settings-screen.fxml");
+    public void werknemerSettings(ActionEvent event) throws IOException {
+        switchScene(event, "werknemer/werknemer-settings-screen.fxml");
+    }
+
+    public void werkgeverSettings(ActionEvent event) throws IOException {
+        switchScene(event, "werkgever/werkgever-settings-screen.fxml");
     }
 
     public void logout(ActionEvent event) {

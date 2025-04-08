@@ -10,7 +10,7 @@
 <?import javafx.collections.FXCollections?>
 <AnchorPane prefWidth="1920.0" prefHeight="1080.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.loef.controllers.SettingsController">
     <HBox fx:id="mainHBox" prefHeight="1080.0" prefWidth="1920.0">
-    <fx:include source="werknemer/nav-screen.fxml"/>
+    <fx:include source="werknemer-nav-screen.fxml"/>
 
         <VBox fx:id="mainContent" style="-fx-padding: 30px;" alignment="CENTER" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
         <AnchorPane prefHeight="60.0" style="-fx-padding: 10px; -fx-background-color: #ecf0f1;">

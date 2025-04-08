@@ -18,7 +18,7 @@
                           style="-fx-pref-width: 200px; -fx-background-color: white;
                                  -fx-border-color: #2c3e50; -fx-border-radius: 5px;
                                  -fx-padding: 5px; -fx-font-size: 14px;
-                                 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);" promptText="Maart">
+                                 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);" promptText="April">
                     <AnchorPane.rightAnchor>20.0</AnchorPane.rightAnchor>
                     <items>
                         <FXCollections fx:factory="observableArrayList">

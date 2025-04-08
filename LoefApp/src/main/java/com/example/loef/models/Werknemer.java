@@ -21,12 +21,21 @@ public class Werknemer {
     }
 
     private void laadUrenUitJson() {
+        uren.clear();
+
         JSONObject jsonObject = leesJsonBestand(bestandsPad);
+        if (jsonObject == null) return;
+
         JSONArray urenArray = jsonObject.getJSONArray("uren");
 
         for (int i = 0; i < urenArray.length(); i++) {
             uren.add(urenArray.getDouble(i));
         }
+    }
+
+    public void wijzigMaand(String maand) {
+        this.bestandsPad = "maandenData/" + maand + ".json";
+        laadUrenUitJson();
     }
 
     public String getNaam() {
@@ -45,3 +54,4 @@ public class Werknemer {
         this.loon = loon;
     }
 }
+
