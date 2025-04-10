@@ -16,11 +16,9 @@ public class SettingsController {
 
     @FXML
     public void initialize() {
-        // Laad opgeslagen resolutie
         resolutionComboBox.setValue(resolutionManager.getCurrentResolution());
         applyResolution(resolutionManager.getCurrentResolution());
 
-        // Luister naar wijzigingen in de ComboBox
         resolutionComboBox.setOnAction(event -> {
             String selectedResolution = resolutionComboBox.getValue();
             resolutionManager.setResolution(selectedResolution);

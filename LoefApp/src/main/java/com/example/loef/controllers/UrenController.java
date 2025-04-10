@@ -21,14 +21,20 @@ import java.nio.file.Paths;
 
 public class UrenController {
 
+    public ObservableList<DataUren> dataObservableList = FXCollections.observableArrayList();
+
     private static final int UURLOON = 13;
     public static final String MAP_NAAM = "maandenData/";
     public String geselecteerdeMaand = "April";
 
     @FXML
-    private TextField infoInput;
+    public TextField infoInput;
     @FXML
-    private Label substringOutput, urenOutput, geldOutput;
+    public Label substringOutput;
+    @FXML
+    public Label urenOutput;
+    @FXML
+    public Label geldOutput;
     @FXML
     private TableView<DataUren> dataListTable;
     @FXML
@@ -38,7 +44,6 @@ public class UrenController {
     @FXML
     private HBox mainHBox;
 
-    private final ObservableList<DataUren> dataObservableList = FXCollections.observableArrayList();
     private final ResolutionController resolutionManager = ResolutionController.getInstance();
     private final ExcelExporter excelExporter = new ExcelExporter();
 
@@ -94,32 +99,6 @@ public class UrenController {
                 toonData();
             }
         });
-    }
-
-    @FXML
-    public void exportExcel() {
-        String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
-        File bestand = new File(bestandsPad);
-
-        if (!bestand.exists()) {
-            showAlert(Alert.AlertType.ERROR, "Geen gegevens beschikbaar voor " + geselecteerdeMaand);
-            return;
-        }
-
-        try {
-            String inhoud = new String(Files.readAllBytes(Paths.get(bestandsPad)));
-            JSONObject json = new JSONObject(inhoud);
-
-            JSONArray dataArray = json.optJSONArray("data");
-            JSONArray urenArray = json.optJSONArray("uren");
-
-            if (dataArray != null && urenArray != null) {
-                excelExporter.exportToExcel(geselecteerdeMaand, dataArray, urenArray);
-            }
-        } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Fout bij het lezen van het JSON-bestand.");
-            e.printStackTrace();
-        }
     }
 
     private void showAlert(Alert.AlertType alertType, String message) {
@@ -197,14 +176,14 @@ public class UrenController {
             updateUrenEnLoon();
 
             infoInput.clear();
-            substringOutput.setText("");
+            substringOutput.setText(totalWork + " uren toegevoegd!");
             System.out.println("Succesvol ingevuld!");
         } else {
             substringOutput.setText("Voer een reeks in!");
         }
     }
 
-    public boolean updateUrenEnLoon() {
+    public void updateUrenEnLoon() {
         try {
             double totaalUren = dataObservableList.stream().mapToDouble(DataUren::getUren).sum();
             double totaalVerdient = totaalUren * UURLOON;
@@ -212,10 +191,8 @@ public class UrenController {
             urenOutput.setText("Gewerkte uren: " + totaalUren);
             geldOutput.setText("Totaal verdiend: €" + String.format("%.2f", totaalVerdient));
 
-            return true;
         } catch (Exception e) {
             System.out.println("Opslaan is mislukt.");
-            return false;
         }
     }
 
@@ -259,6 +236,32 @@ public class UrenController {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(bestandsPad))) {
             writer.write(jsonObject.toString(4));
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void exportExcel() {
+        String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
+        File bestand = new File(bestandsPad);
+
+        if (!bestand.exists()) {
+            showAlert(Alert.AlertType.ERROR, "Geen gegevens beschikbaar voor " + geselecteerdeMaand);
+            return;
+        }
+
+        try {
+            String inhoud = new String(Files.readAllBytes(Paths.get(bestandsPad)));
+            JSONObject json = new JSONObject(inhoud);
+
+            JSONArray dataArray = json.optJSONArray("data");
+            JSONArray urenArray = json.optJSONArray("uren");
+
+            if (dataArray != null && urenArray != null) {
+                excelExporter.exportToExcel(geselecteerdeMaand, dataArray, urenArray);
+            }
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Fout bij het lezen van het JSON-bestand.");
             e.printStackTrace();
         }
     }

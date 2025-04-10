@@ -36,8 +36,6 @@ public class WerkgeverUrenController {
     private ComboBox<String> maandSelectie;
     public String geselecteerdeMaand = "April";
 
-    public static final String MAP_NAAM = "maandenData/";
-
     private final WerknemerData dataService = WerknemerData.getInstance();
     private final ResolutionController resolutionManager = ResolutionController.getInstance();
 
