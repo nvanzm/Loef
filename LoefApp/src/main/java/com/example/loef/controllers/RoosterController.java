@@ -1,6 +1,7 @@
 package com.example.loef.controllers;
 
 import com.example.loef.models.Calendar;
+import com.example.loef.models.Werknemer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -173,9 +174,12 @@ public class RoosterController implements Initializable {
         int month = dateFocus.getMonth().getValue();
 
         Random random = new Random();
+
+        Werknemer werknemer = new Werknemer("Noach Ambachtsheer");
+
         for (int i = 0; i < 50; i++) {
-            ZonedDateTime time = ZonedDateTime.of(year, month, random.nextInt(27)+1, 16,0,0,0,dateFocus.getZone());
-            calendarActivities.add(new Calendar(time, "Noach", 111111));
+            ZonedDateTime time = ZonedDateTime.of(year, month, random.nextInt(27) + 1, 16, 0, 0, 0, dateFocus.getZone());
+            calendarActivities.add(new Calendar(time, "Noach", 111111, werknemer));
         }
 
         return createCalendarMap(calendarActivities);

@@ -1,7 +1,7 @@
 package com.example.loef.controllers;
 
-import com.example.loef.models.Login;
 import com.example.loef.Startup;
+import com.example.loef.models.Login;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

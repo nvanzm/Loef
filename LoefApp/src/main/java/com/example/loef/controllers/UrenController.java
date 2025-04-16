@@ -1,10 +1,9 @@
 package com.example.loef.controllers;
 
+import com.example.loef.models.DataUrenItem;
 import com.example.loef.models.DataUren;
-import com.example.loef.util.JsonService;
+import com.example.loef.models.Werknemer;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
@@ -21,97 +20,78 @@ import java.nio.file.Paths;
 
 public class UrenController {
 
-    public ObservableList<DataUren> dataObservableList = FXCollections.observableArrayList();
-
     private static final int UURLOON = 13;
+    private final Werknemer actieveWerknemer = new Werknemer("Noach Ambachtsheer");
     public static final String MAP_NAAM = "maandenData/";
-    public String geselecteerdeMaand = "April";
 
-    @FXML
-    public TextField infoInput;
-    @FXML
-    public Label substringOutput;
-    @FXML
-    public Label urenOutput;
-    @FXML
-    public Label geldOutput;
-    @FXML
-    private TableView<DataUren> dataListTable;
-    @FXML
-    private TableColumn<DataUren, String> dataColumn, urenColumn;
-    @FXML
-    private ComboBox<String> maandSelectie;
-    @FXML
-    private HBox mainHBox;
+    private final DataUren dataModel = new DataUren();
+    public static String geselecteerdeMaand = "April";
+
+    @FXML private TextField infoInput;
+    @FXML private Label substringOutput, urenOutput, geldOutput;
+    @FXML private TableView<DataUrenItem> dataListTable;
+    @FXML private TableColumn<DataUrenItem, String> dataColumn, urenColumn;
+
+    @FXML private ComboBox<String> maandSelectie;
+    @FXML private HBox mainHBox;
 
     private final ResolutionController resolutionManager = ResolutionController.getInstance();
-    private final ExcelExporter excelExporter = new ExcelExporter();
-
-    private final JsonService jsonService = new JsonService();
 
     @FXML
     public void initialize() {
         configureTableColumns();
         applyResolution(resolutionManager.getCurrentResolution());
-        configureMaandSelectieListener();
-        toonData();
-        updateUrenEnLoon();
+        configureMaandSelectie();
+        configureContextMenu();
 
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem deleteItem = new MenuItem("Delete");
-
-        deleteItem.setStyle(
-                "-fx-background-color: #e74c3c; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-font-size: 14px; " +
-                        "-fx-font-weight: bold; " +
-                        "-fx-padding: 10px 15px; " +
-                        "-fx-border-radius: 3px; "
+        maandSelectie.getItems().addAll(
+                "Januari", "Februari", "Maart", "April", "Mei", "Juni",
+                "Juli", "Augustus", "September", "Oktober", "November", "December"
         );
-        deleteItem.setOnAction(event -> deleteSelectedItem());
-        contextMenu.getItems().add(deleteItem);
-
-        dataListTable.setRowFactory(tableView -> {
-            TableRow<DataUren> row = new TableRow<>();
-
-            row.setContextMenu(contextMenu);
-
-            row.setOnMouseClicked(event -> {
-                if (event.getButton() == MouseButton.PRIMARY && !row.isEmpty()) {
-                    DataUren selectedItem = row.getItem();
-                }
-            });
-
-            return row;
-        });
+        maandSelectie.getSelectionModel().select(geselecteerdeMaand);
+        laadData();
     }
 
     private void configureTableColumns() {
         dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getData()));
         urenColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getUren())));
-        dataListTable.setItems(dataObservableList);
+        dataListTable.setItems(dataModel.getDataLijst());
     }
 
-    private void configureMaandSelectieListener() {
-        maandSelectie.getSelectionModel().selectedItemProperty().addListener((observable, oudeWaarde, nieuweWaarde) -> {
-            if (nieuweWaarde != null) {
-                geselecteerdeMaand = nieuweWaarde;
-                toonData();
+    private void configureMaandSelectie() {
+        maandSelectie.getSelectionModel().selectedItemProperty().addListener((obs, oud, nieuw) -> {
+            if (nieuw != null) {
+                geselecteerdeMaand = nieuw;
+                laadData();
             }
         });
     }
 
-    private void showAlert(Alert.AlertType alertType, String message) {
-        Alert alert = new Alert(alertType, message, ButtonType.OK);
-        alert.showAndWait();
+    private void configureContextMenu() {
+        ContextMenu menu = new ContextMenu();
+        MenuItem verwijderItem = new MenuItem("Verwijder");
+        verwijderItem.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;");
+        verwijderItem.setOnAction(e -> verwijderGeselecteerdeItem());
+        menu.getItems().add(verwijderItem);
+
+        dataListTable.setRowFactory(tv -> {
+            TableRow<DataUrenItem> row = new TableRow<>();
+            row.setContextMenu(menu);
+            row.setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.PRIMARY && !row.isEmpty()) {
+
+                }
+            });
+            return row;
+        });
     }
 
     private void applyResolution(String resolution) {
-        String[] dimensions = resolution.split("x");
-        if (dimensions.length == 2) {
+        String[] parts = resolution.split("x");
+        if (parts.length == 2) {
             try {
-                double width = Double.parseDouble(dimensions[0]);
-                double height = Double.parseDouble(dimensions[1]);
+                double width = Double.parseDouble(parts[0]);
+                double height = Double.parseDouble(parts[1]);
                 mainHBox.setPrefWidth(width);
                 mainHBox.setPrefHeight(height);
             } catch (NumberFormatException e) {
@@ -120,181 +100,116 @@ public class UrenController {
         }
     }
 
-    private void toonData() {
-        String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
-        try {
-            String inhoud = new String(Files.readAllBytes(Paths.get(bestandsPad)));
-            if (!inhoud.trim().isEmpty()) {
-                JSONObject json = new JSONObject(inhoud);
-                JSONArray dataArray = json.optJSONArray("data");
-                JSONArray urenArray = json.optJSONArray("uren");
-
-                dataObservableList.clear();
-                if (dataArray != null && urenArray != null) {
-                    for (int i = 0; i < dataArray.length(); i++) {
-                        String item = dataArray.getString(i);
-                        double uren = urenArray.getDouble(i);
-                        dataObservableList.add(new DataUren(item, uren));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Geen bestaande data voor deze maand.");
-            dataObservableList.clear();
-        }
-
+    private void laadData() {
+        dataModel.laadData(geselecteerdeMaand, actieveWerknemer);
         updateUrenEnLoon();
     }
 
     @FXML
     public void telUren() {
-        if (!infoInput.getText().isEmpty()) {
-            String infoInputText = infoInput.getText();
-            String aangepasteText = infoInputText.substring(11);
+        String input = infoInput.getText();
+        if (input.isEmpty()) {
+            substringOutput.setText("Voer een tijdregel in!");
+            return;
+        }
 
-            String eersteUur = aangepasteText.substring(0, 5);
-            String tweedeUur = aangepasteText.substring(8);
+        try {
+            String tijdData = input.substring(11);
+            String beginTijd = tijdData.substring(0, 5);
+            String eindTijd = tijdData.substring(8);
 
-            String tweedeUurFirstString = tweedeUur.substring(0, 2);
-            String tweedeUurSecondString = tweedeUur.substring(3);
+            double gewerkteUren = berekenUren(beginTijd, eindTijd);
 
-            String eersteUurFirstString = eersteUur.substring(0, 2);
-            String eersteUurSecondString = eersteUur.substring(3);
+            dataModel.voegToe(input, gewerkteUren, geselecteerdeMaand, actieveWerknemer);
 
-            double tweedeUrenFirstDouble = Double.parseDouble(tweedeUurFirstString);
-            double eersteUrenFirstDouble = Double.parseDouble(eersteUurFirstString);
-            double tweedeUrenSecondDouble = Double.parseDouble(tweedeUurSecondString);
-            double eersteUrenSecondDouble = Double.parseDouble(eersteUurSecondString);
-
-            double tweedeUurInDecimalen = tweedeUrenFirstDouble + (tweedeUrenSecondDouble / 60.0);
-            double eersteUurInDecimalen = eersteUrenFirstDouble + (eersteUrenSecondDouble / 60.0);
-
-            double totalWork = tweedeUurInDecimalen - eersteUurInDecimalen;
-
-            saveUren(totalWork);
-            saveData(infoInput.getText());
             updateUrenEnLoon();
 
             infoInput.clear();
-            substringOutput.setText(totalWork + " uren toegevoegd!");
-            System.out.println("Succesvol ingevuld!");
-        } else {
-            substringOutput.setText("Voer een reeks in!");
-        }
-    }
-
-    public void updateUrenEnLoon() {
-        try {
-            double totaalUren = dataObservableList.stream().mapToDouble(DataUren::getUren).sum();
-            double totaalVerdient = totaalUren * UURLOON;
-
-            urenOutput.setText("Gewerkte uren: " + totaalUren);
-            geldOutput.setText("Totaal verdiend: €" + String.format("%.2f", totaalVerdient));
-
+            substringOutput.setText(gewerkteUren + " uur toegevoegd!");
         } catch (Exception e) {
-            System.out.println("Opslaan is mislukt.");
+            substringOutput.setText("Ongeldige invoer! Voorbeeld: 15-04-2025 - Tijd: 14:00 tot 18:00");
         }
     }
 
-    private void saveUren(double totaleUren) {
-        JsonService.saveJsonData("uren", totaleUren, geselecteerdeMaand);
-        toonData();
+    private double berekenUren(String begin, String eind) {
+        int startUur = Integer.parseInt(begin.substring(0, 2));
+        int startMin = Integer.parseInt(begin.substring(3));
+        int eindUur = Integer.parseInt(eind.substring(0, 2));
+        int eindMin = Integer.parseInt(eind.substring(3));
+        return (eindUur + eindMin / 60.0) - (startUur + startMin / 60.0);
     }
 
-    private void saveData(String data) {
-        JsonService.saveJsonData("data", data, geselecteerdeMaand);
-        toonData();
+    private void updateUrenEnLoon() {
+        double totaalUren = dataModel.getTotaalUren();
+        double totaalLoon = dataModel.getTotaalLoon(UURLOON);
+
+        urenOutput.setText("Gewerkte uren: " + totaalUren);
+        geldOutput.setText("Totaal verdiend: €" + String.format("%.2f", totaalLoon));
     }
 
-    private void deleteSelectedItem() {
-        DataUren selectedItem = dataListTable.getSelectionModel().getSelectedItem();
-        if (selectedItem != null) {
-            dataObservableList.remove(selectedItem);
-            removeDataFromJson(selectedItem);
+    private void verwijderGeselecteerdeItem() {
+        DataUrenItem geselecteerd = dataListTable.getSelectionModel().getSelectedItem();
+
+        if (geselecteerd != null) {
+            dataModel.verwijder(geselecteerd, geselecteerdeMaand);
             updateUrenEnLoon();
-        }
-    }
-
-    private void removeDataFromJson(DataUren selectedItem) {
-        String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
-        JSONObject jsonObject = JsonService.leesJsonBestand(bestandsPad);
-
-        JSONArray dataArray = jsonObject.optJSONArray("data");
-        JSONArray urenArray = jsonObject.optJSONArray("uren");
-
-        if (dataArray != null && urenArray != null) {
-            int index = dataArray.toList().indexOf(selectedItem.getData());
-            if (index != -1) {
-                dataArray.remove(index);
-                urenArray.remove(index);
-
-                jsonObject.put("data", dataArray);
-                jsonObject.put("uren", urenArray);
-            }
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(bestandsPad))) {
-            writer.write(jsonObject.toString(4));
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     @FXML
     public void exportExcel() {
-        String bestandsPad = Paths.get(MAP_NAAM, geselecteerdeMaand + ".json").toString();
-        File bestand = new File(bestandsPad);
+        String bestandPad = MAP_NAAM + geselecteerdeMaand + ".json";
+        File bestand = new File(bestandPad);
 
         if (!bestand.exists()) {
-            showAlert(Alert.AlertType.ERROR, "Geen gegevens beschikbaar voor " + geselecteerdeMaand);
+            toonAlert(Alert.AlertType.ERROR, "Geen gegevens beschikbaar voor " + geselecteerdeMaand);
             return;
         }
 
         try {
-            String inhoud = new String(Files.readAllBytes(Paths.get(bestandsPad)));
+            String inhoud = new String(Files.readAllBytes(Paths.get(bestandPad)));
             JSONObject json = new JSONObject(inhoud);
+            JSONArray data = json.optJSONArray("data");
+            JSONArray uren = json.optJSONArray("uren");
 
-            JSONArray dataArray = json.optJSONArray("data");
-            JSONArray urenArray = json.optJSONArray("uren");
-
-            if (dataArray != null && urenArray != null) {
-                excelExporter.exportToExcel(geselecteerdeMaand, dataArray, urenArray);
+            if (data != null && uren != null) {
+                exportToExcel(geselecteerdeMaand, data, uren);
             }
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Fout bij het lezen van het JSON-bestand.");
+            toonAlert(Alert.AlertType.ERROR, "Fout bij het lezen van JSON-bestand.");
             e.printStackTrace();
         }
     }
 
-    class ExcelExporter {
+    private void exportToExcel(String maand, JSONArray data, JSONArray uren) throws IOException {
+        Workbook werkboek = new XSSFWorkbook();
+        Sheet sheet = werkboek.createSheet(maand);
 
-        public void exportToExcel(String maand, JSONArray dataArray, JSONArray urenArray) throws IOException {
-            Workbook werkboek = new XSSFWorkbook();
-            Sheet sheet = werkboek.createSheet(maand);
+        Row kop = sheet.createRow(0);
+        kop.createCell(0).setCellValue("Datum");
+        kop.createCell(1).setCellValue("Uren");
 
-            Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Datum");
-            headerRow.createCell(1).setCellValue("Uren");
+        for (int i = 0; i < data.length(); i++) {
+            Row rij = sheet.createRow(i + 1);
+            rij.createCell(0).setCellValue(data.getString(i));
+            rij.createCell(1).setCellValue(uren.getDouble(i));
+        }
 
-            for (int i = 0; i < dataArray.length(); i++) {
-                Row row = sheet.createRow(i + 1);
-                row.createCell(0).setCellValue(dataArray.getString(i));
-                row.createCell(1).setCellValue(urenArray.getDouble(i));
-            }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(maand + ".xlsx");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel-bestand", "*.xlsx"));
 
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel bestand", "*.xlsx"));
-            fileChooser.setInitialFileName(maand + ".xlsx");
-
-            File gekozenBestand = fileChooser.showSaveDialog(null);
-            if (gekozenBestand != null) {
-                try (FileOutputStream fileOut = new FileOutputStream(gekozenBestand)) {
-                    werkboek.write(fileOut);
-                    werkboek.close();
-
-                    new Alert(Alert.AlertType.INFORMATION, "Bestand succesvol opgeslagen als Excel!", ButtonType.OK).showAndWait();
-                }
+        File gekozenBestand = fileChooser.showSaveDialog(null);
+        if (gekozenBestand != null) {
+            try (FileOutputStream out = new FileOutputStream(gekozenBestand)) {
+                werkboek.write(out);
+                werkboek.close();
+                toonAlert(Alert.AlertType.INFORMATION, "Excel succesvol opgeslagen!");
             }
         }
+    }
+
+    private void toonAlert(Alert.AlertType type, String bericht) {
+        new Alert(type, bericht, ButtonType.OK).showAndWait();
     }
 }

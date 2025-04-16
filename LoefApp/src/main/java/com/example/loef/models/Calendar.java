@@ -7,10 +7,13 @@ public class Calendar {
     private String clientName;
     private Integer serviceNo;
 
-    public Calendar(ZonedDateTime date, String clientName, Integer serviceNo) {
+    private Werknemer werknemer;
+
+    public Calendar(ZonedDateTime date, String clientName, Integer serviceNo, Werknemer werknemer) {
         this.date = date;
         this.clientName = clientName;
         this.serviceNo = serviceNo;
+        this.werknemer = werknemer;
     }
 
     public ZonedDateTime getDate() {
@@ -37,12 +40,21 @@ public class Calendar {
         this.serviceNo = serviceNo;
     }
 
+    public Werknemer getWerknemer() {
+        return werknemer;
+    }
+
+    public void setWerknemer(Werknemer werknemer) {
+        this.werknemer = werknemer;
+    }
+
     @Override
     public String toString() {
-        return "CalenderActivity{" +
+        return "CalendarActivity{" +
                 "date=" + date +
                 ", clientName='" + clientName + '\'' +
                 ", serviceNo=" + serviceNo +
+                ", werknemer=" + (werknemer != null ? werknemer.getNaam() : "Onbekend") +
                 '}';
     }
 }

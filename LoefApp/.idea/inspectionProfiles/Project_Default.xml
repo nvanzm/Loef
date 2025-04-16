@@ -14,6 +14,7 @@
           <option value="LoefApp" />
           <option value="LoefApp" />
           <option value="LoefApp" />
+          <option value="LoefApp" />
         </list>
       </option>
       <option name="ignoredPackages">
@@ -21,10 +22,12 @@
           <option value="commons-io:commons-io:2.11.0" />
           <option value="org.json:json:20210307" />
           <option value="org.apache.commons:commons-compress:1.21" />
+          <option value="org.apache.poi:poi-ooxml:5.2.3" />
         </list>
       </option>
       <option name="ignoredReasons">
         <list>
+          <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />

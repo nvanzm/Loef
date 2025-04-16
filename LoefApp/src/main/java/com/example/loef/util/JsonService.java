@@ -11,8 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class JsonService {
-     public static void saveJsonData(String sleutel, Object waarde, String maand) {
-        String bestandsPad = Paths.get(UrenController.MAP_NAAM, maand + ".json").toString();
+     public static void saveJsonData(String sleutel, Object waarde) {
+        String bestandsPad = Paths.get(UrenController.MAP_NAAM, UrenController.geselecteerdeMaand + ".json").toString();
         JSONObject jsonObject = leesJsonBestand(bestandsPad);
         JSONArray jsonArray = jsonObject.optJSONArray(sleutel);
         if (jsonArray == null) jsonArray = new JSONArray();
@@ -34,6 +34,14 @@ public class JsonService {
         } catch (IOException e) {
             System.err.println("Fout bij laden van JSON-bestand: " + e.getMessage());
             return new JSONObject();
+        }
+    }
+
+    public static void schrijfHeleJson(String pad, JSONObject jsonObject) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(pad))) {
+            writer.write(jsonObject.toString(4));
+        } catch (IOException e) {
+            System.err.println("Fout bij schrijven van volledig JSON-bestand: " + e.getMessage());
         }
     }
 }
