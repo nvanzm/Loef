@@ -127,7 +127,7 @@ public class UrenController {
             infoInput.clear();
             substringOutput.setText(gewerkteUren + " uur toegevoegd!");
         } catch (Exception e) {
-            substringOutput.setText("Ongeldige invoer! Voorbeeld: 15-04-2025 - Tijd: 14:00 tot 18:00");
+            substringOutput.setText("Ongeldige invoer! Voorbeeld: 28/03/2025 16:00 - 20:30");
         }
     }
 
